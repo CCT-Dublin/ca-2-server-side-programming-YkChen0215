@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CA2 Secure Form</title>
+
+  <!-- link to the CSS -->
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="card">
+      <h1>Submit User Details</h1>
+
+        <!-- 
+      Form created to collect user information.
+      novalidate is used so validation will be handled by JavaScript.
+    -->
+      <form id="userForm" novalidate>
+        
+        <!-- User name details -->
+        <label for="firstName">First Name</label>
+        <input id="firstName" name="first_name" type="text" maxlength="20" required />
+        <small class="hint">Letters/numbers only, max 20 characters</small>
+        <div id="firstNameError" class="error" aria-live="polite"></div>
+
+        <label for="secondName">Second Name</label>
+        <input id="secondName" name="second_name" type="text" maxlength="20" required />
+        <small class="hint">Letters/numbers only, max 20 characters</small>
+        <div id="secondNameError" class="error" aria-live="polite"></div>
+
+        <!-- Email  -->
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required />
+        <small class="hint">Example: name@example.com</small>
+        <div id="emailError" class="error" aria-live="polite"></div>
+
+         <!-- Phone number -->
+        <label for="phone">Phone Number</label>
+        <input id="phone" name="phone_number" type="text" inputmode="numeric" maxlength="10" required />
+        <small class="hint">Exactly 10 digits</small>
+        <div id="phoneError" class="error" aria-live="polite"></div>
+
+        <!-- Eircode input -->
+        <label for="eircode">Eircode</label>
+        <input id="eircode" name="eircode" type="text" maxlength="6" required />
+        <small class="hint">6 chars, starts with a number, alphanumeric</small>
+        <div id="eircodeError" class="error" aria-live="polite"></div>
+
+        <!-- Submit button -->
+        <button id="submitBtn" type="submit">Submit</button>
+
+        
+      <!-- Message is show after submit the form -->
+        <div id="serverMessage" class="server-msg" aria-live="polite"></div>
+      </form>
+
+    </section>
+  </main>
+
+  <!-- Link to JS -->
+  <script src="/script.js"></script>
+</body>
+</html>
