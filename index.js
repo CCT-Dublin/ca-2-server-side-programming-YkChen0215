@@ -18,9 +18,9 @@ app.use(express.urlencoded({ extended: true }));
 // serve css and javascript files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// temporary check the server is running
+// serve the HTML form
 app.get('/', (req, res) => {
-  res.send('<h1>ca2 server is running</h1><p>form will be added here later.</p>');
+  res.sendFile(path.join(__dirname, 'form.html'));
 });
 
 // simple health check to make sure server is alive
