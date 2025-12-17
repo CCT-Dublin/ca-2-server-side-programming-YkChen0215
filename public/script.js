@@ -64,7 +64,7 @@ Object.keys(fields).forEach(key => {
 });
 
 // handle form submit
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   serverMessage.textContent = '';
@@ -76,8 +76,45 @@ form.addEventListener('submit', (e) => {
     serverMessage.textContent = 'please fix the errors above.';
     return;
   }
+ //disable the button to prevent submit again
+ submitBtn.disabled = true;
 
-  // success message
+try {
+// prepare data to send to the server 
+    const payload = {
+      first_name: fields.firstName.value.trim(),
+      second_name: fields.secondName.value.trim(),
+      email: fields.email.value.trim(),
+      phone_number: fields.phone.value.trim(),
+      eircode: fields.eircode.value.trim()
+    };
+    // send data to the server
+    const response = await fetch('/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    // read server response
+    const data = await response.json();
+
+    // handle server-side error
+    if (!response.ok) {
+      serverMessage.className = 'server-msg error';
+      serverMessage.textContent = data.error || 'Server rejected the request.';
+      return;
+    }
+
+  // success message from server
   serverMessage.className = 'server-msg success';
-  serverMessage.textContent = 'client-side validation passed.';
+  serverMessage.textContent = data.message || 'Submitted successfully!';
+    form.reset();
+
+  } catch (err) {
+    // handle network or server failure
+    serverMessage.className = 'server-msg error';
+    serverMessage.textContent = 'Network or server error. Please try again later.';
+  } finally {
+    // enable submit button again
+    submitBtn.disabled = false;
+  }
 });

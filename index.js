@@ -28,6 +28,18 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
+// temporary test
+app.post('/submit', (req, res) => {
+  // log data to check the server is receiving it
+  console.log('received form data:', req.body);
+
+  // send back a success response
+  return res.status(201).json({
+    message: 'server received the data successfully.',
+    received: req.body
+  });
+});
+
 // start the server normally
 app.listen(PORT, () => {
   console.log(`server running on http://localhost:${PORT}`);
