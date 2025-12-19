@@ -83,7 +83,8 @@ app.get('/import-csv', async (req, res) => {
         .pipe(parse({
           columns: true,        // use header row as keys
           trim: true,
-          skip_empty_lines: true
+          skip_empty_lines: true,
+          bom: true
         }))
         .on('data', (row) => {
           excelRow += 1;
