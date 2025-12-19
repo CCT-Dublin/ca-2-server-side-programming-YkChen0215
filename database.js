@@ -1,4 +1,3 @@
-//database.js
 //basic SQL config+ helper to get a connection pool
 
 const mysql = require('mysql2/promise');
@@ -15,8 +14,7 @@ const dbConfig = {
 let pool;
 
 
-//get or create the MySQL connection pool.
-//other files (index.js, CSV logic, form handler) will call this.
+//get or create the MySQL connection pool for other file to call
  
 async function getPool() {
   if (!pool) {

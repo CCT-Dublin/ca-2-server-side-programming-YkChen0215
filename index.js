@@ -35,6 +35,50 @@ app.use(express.urlencoded({ extended: true }));
 // serve css and javascript files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
+// clean user input and remove unwanted characters
+function cleanText(value) {
+  return String(value || '')
+    .trim()
+    .replace(/[<>]/g, '')   // remove <  >
+    .replace(/\s+/g, ' ');  // remove extra spaces
+}
+
+// server-side validation rules 
+const namePattern = /^[A-Za-z0-9]{1,20}$/;        // letters and numbers only max 20
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // basic email format
+const phonePattern = /^\d{10}$/;                  // exactly 10 digits
+const eircodePattern = /^[0-9][A-Za-z0-9]{5}$/;   // starts with number and 6 chars only
+
+// clean and validate incoming form data
+function validatePayload(body) {
+  const cleaned = {
+    first_name: cleanText(body.first_name),              // clean text input
+    second_name: cleanText(body.second_name),
+    email: cleanText(body.email),
+    phone_number: cleanText(body.phone_number),
+    eircode: cleanText(body.eircode)                     // clean eircode
+      .replace(/\s+/g, '')                               // remove spaces
+      .toUpperCase()                                     // make the eircode to uppercase
+  };
+
+  const errors = {};
+
+  // check each field and collect errors
+  if (!namePattern.test(cleaned.first_name)) errors.first_name = 'first_name invalid';
+  if (!namePattern.test(cleaned.second_name)) errors.second_name = 'second_name invalid';
+  if (!emailPattern.test(cleaned.email)) errors.email = 'email invalid';
+  if (!phonePattern.test(cleaned.phone_number)) errors.phone_number = 'phone_number invalid';
+  if (!eircodePattern.test(cleaned.eircode)) errors.eircode = 'eircode invalid';
+
+  // show cleaned data, errors, and the final result
+  return {
+    cleaned,
+    errors,
+    valid: Object.keys(errors).length === 0
+  };
+}
+
+
 // serve the HTML form
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'form.html'));
@@ -45,27 +89,34 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
+// check the form submitted and save valid data to the database
 app.post('/submit', async (req, res) => {
   try {
-    // make sure the table exists before saving
-    await ensureSchema();
+    await ensureSchema(); // make sure the table exists
 
-    // save the form data to the database
-    const newId = await insertFormRecord(req.body);
+    const { cleaned, errors, valid } = validatePayload(req.body); // clean and validate input
 
-    // send success response back to the front end
+    if (!valid) { // stop if validation fails
+      return res.status(400).json({
+        error: 'validation failed',
+        errors
+      });
+    }
+
+    const newId = await insertFormRecord(cleaned); // save data to database
+
     return res.status(201).json({
       message: `saved successfully (id: ${newId})`
     });
 
   } catch (err) {
-    // log error and send generic message
-    console.error('db insert error:', err);
+    console.error('db insert error:', err);   // log the error on the server
     return res.status(500).json({
-      error: 'server/database error. please try again later.'
+      error: 'server/database error. please try again later.' // send a simple error message to the user
     });
   }
 });
+
 
 // import csv file then save valid rows to the database
 app.get('/import-csv', async (req, res) => {
