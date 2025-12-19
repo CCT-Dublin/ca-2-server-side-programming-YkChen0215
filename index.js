@@ -10,7 +10,23 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 // use helmet for basic security headers
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],        // allow content only from my server
+        scriptSrc: ["'self'"],         // allow javascript only from my server
+        styleSrc: ["'self'"],          // allow css only from my server
+        imgSrc: ["'self'", "data:"],   // allow local images and data urls
+        connectSrc: ["'self'"],        // only allow send data requests to itself
+        objectSrc: ["'none'"],         // block plugins from old browser to run on the site
+        baseUri: ["'self'"],           // prevent attacker change the base url
+        frameAncestors: ["'none'"]     // not allowed the website to be shown inside any iframe on any other site
+      }
+    }
+  })
+);
+
 
 // let the server read json and normal form data
 app.use(express.json());
