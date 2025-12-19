@@ -73,5 +73,38 @@ async function insertFormRecord(data) {
   return result.insertId;
 }
 
+ //inserts many csv records into the database at once 
+async function insertManyRecords(records) {
+  if (!records || records.length === 0) return 0;  // skips if there is nothing to insert
+
+  const pool = await getPool();
+
+  const sql = `
+    INSERT INTO mysql_table (first_name, second_name, email, phone_number, eircode)
+    VALUES ?
+  `;
+
+  // turn record objects into arrays
+  const values = records.map(r => [
+    r.first_name,
+    r.second_name,
+    r.email,
+    r.phone_number,
+    r.eircode
+  ]);
+
+  const [result] = await pool.query(sql, [values]);
+
+  return result.affectedRows; // return how many rows were added
+}
+
+
 //export these so index.js can usse them
-module.exports = { getPool, dbConfig, ensureSchema, insertFormRecord };
+module.exports = {
+  getPool,
+  dbConfig,
+  ensureSchema,
+  insertFormRecord,
+  insertManyRecords
+};
+
